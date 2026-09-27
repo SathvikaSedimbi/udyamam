@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UDYAMAM - My Daily Diet & Weight Tracker</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- Chart.js for smooth data visualizations -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <!-- MAIN APP CONTAINER -->
+  <div class="app-container">
+
+    <!-- HEADER / DASHBOARD TOP -->
+    <header class="dashboard-header">
+      <div class="header-main">
+        <div class="brand">
+          <span class="brand-badge">🌸 UDYAMAM</span>
+          <h1>My Daily Diet Tracker</h1>
+          <p class="tagline">Amma's Personal Health & Wellness Journey</p>
+        </div>
+        
+        <!-- Motivational Quote Banner -->
+        <div class="quote-card">
+          <span class="quote-icon">✨</span>
+          <p class="quote-text">"Small daily wins create big changes."</p>
+        </div>
+      </div>
+
+      <!-- User Profile Snapshot -->
+      <div class="profile-chips">
+        <div class="chip">
+          <span class="chip-label">Starting Weight</span>
+          <span class="chip-value">85.0 kg</span>
+        </div>
+        <div class="chip">
+          <span class="chip-label">Height</span>
+          <span class="chip-value">5' 4"</span>
+        </div>
+        <div class="chip">
+          <span class="chip-label">Age</span>
+          <span class="chip-value">50 Years</span>
+        </div>
+        <div class="chip highlight">
+          <span class="chip-label">Primary Goal</span>
+          <span class="chip-value">Weight Loss 🎯</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- TODAY'S SUMMARY KPI CARDS -->
+    <section class="summary-grid" aria-label="Today's Quick Summary">
+      <!-- Current Weight Card -->
+      <div class="kpi-card">
+        <div class="kpi-header">
+          <span class="kpi-icon">⚖️</span>
+          <span class="kpi-title">Current Weight</span>
+        </div>
+        <div class="kpi-value-container">
+          <span class="kpi-number" id="kpiCurrentWeight">-- kg</span>
+        </div>
+        <div class="kpi-subtext" id="kpiWeightChange">Starting: 85.0 kg</div>
+      </div>
+
+      <!-- Today's Achievement Card -->
+      <div class="kpi-card">
+        <div class="kpi-header">
+          <span class="kpi-icon">⭐</span>
+          <span class="kpi-title">Today's Achievement</span>
+        </div>
+        <div class="kpi-value-container">
+          <span class="kpi-number" id="kpiAchievement">--%</span>
+        </div>
+        <div class="kpi-subtext" id="kpiAchievementStatus">Not submitted yet today</div>
+      </div>
+
+      <!-- Water Progress Card -->
+      <div class="kpi-card">
+        <div class="kpi-header">
+          <span class="kpi-icon">💧</span>
+          <span class="kpi-title">Water Progress</span>
+        </div>
+        <div class="kpi-value-container">
+          <span class="kpi-number" id="kpiWater">0.0 / 2.5 L</span>
+        </div>
+        <div class="kpi-subtext" id="kpiWaterStatus">Target: 2.5 Litres</div>
+      </div>
+
+      <!-- Success Streak Card -->
+      <div class="kpi-card">
+        <div class="kpi-header">
+          <span class="kpi-icon">🔥</span>
+          <span class="kpi-title">Success Streak</span>
+        </div>
+        <div class="kpi-value-container">
+          <span class="kpi-number highlight-fire" id="kpiStreak">0 Days</span>
+        </div>
+        <div class="kpi-subtext" id="kpiTotalTracked">Total: 0 Days | Avg: 0%</div>
+      </div>
+    </section>
+
+    <!-- NOTIFICATION TOAST -->
+    <div id="toastMessage" class="toast-message" role="alert" aria-live="polite"></div>
+
+    <!-- MAIN DASHBOARD CONTENT GRID (2-COLUMN ON DESKTOP) -->
+    <div class="main-layout-grid">
+
+      <!-- LEFT COLUMN: CHECKLIST & REPORT -->
+      <div class="layout-column">
+
+        <!-- DAILY CHECKLIST SECTION -->
+        <section class="card checklist-card" id="checklistSection">
+          <div class="card-header">
+            <div>
+              <div class="date-badge" id="todayDateBadge">📅 Today</div>
+              <h2>Daily Diet Checklist</h2>
+            </div>
+            <span class="card-status-indicator" id="formStatusBadge">New Entry</span>
+          </div>
+
+          <form id="dailyChecklistForm" onsubmit="event.preventDefault(); handleChecklistSubmit();">
+            
+            <!-- 1. VEGETABLES -->
+            <div class="checklist-item-box">
+              <div class="item-main">
+                <div class="item-title-row">
+                  <span class="item-emoji">🥬</span>
+                  <div class="item-info">
+                    <label class="item-title" for="vegCheckbox">Vegetables Target</label>
+                    <span class="item-desc">High-fiber greens and cooked veggies (15 pts)</span>
+                  </div>
+                </div>
+                <div class="checkbox-container">
+                  <input type="checkbox" id="vegCheckbox" class="custom-checkbox">
+                  <label for="vegCheckbox" class="checkbox-label">I completed my vegetable target</label>
+                </div>
+              </div>
+              <div class="item-sub-input">
+                <label for="vegQuantity">Optional: Quantity eaten</label>
+                <div class="input-with-unit">
+                  <input type="number" id="vegQuantity" min="0" max="2500" step="10" placeholder="e.g. 250">
+                  <span class="unit-tag">grams</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 2. EGGS -->
+            <div class="checklist-item-box">
+              <div class="item-main">
+                <div class="item-title-row">
+                  <span class="item-emoji">🥚</span>
+                  <div class="item-info">
+                    <label class="item-title" for="eggsInput">Eggs Target: 2 Eggs</label>
+                    <span class="item-desc">Healthy protein for muscle maintenance (15 pts)</span>
+                  </div>
+                </div>
+                <div class="target-status-pill" id="eggsTargetStatus">Target: 2 eggs</div>
+              </div>
+              <div class="item-sub-input">
+                <label for="eggsInput">Eggs eaten today:</label>
+                <div class="input-with-target">
+                  <div class="input-with-unit">
+                    <input type="number" id="eggsInput" min="0" max="10" step="1" value="0">
+                    <span class="unit-tag">/ 2 eggs</span>
+                  </div>
+                  <div class="quick-stepper">
+                    <button type="button" class="btn-step" onclick="adjustEggs(-1)">-</button>
+                    <button type="button" class="btn-step" onclick="adjustEggs(1)">+</button>
+                    <button type="button" class="btn-quick-target" onclick="setEggs(2)">Goal (2)</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 3. PANEER -->
+            <div class="checklist-item-box">
+              <div class="item-main">
+                <div class="item-title-row">
+                  <span class="item-emoji">🧀</span>
+                  <div class="item-info">
+                    <label class="item-title" for="paneerInput">Paneer Target: ~75–100 g</label>
+                    <span class="item-desc">Rich vegetarian calcium and protein source (15 pts)</span>
+                  </div>
+                </div>
+                <div class="target-status-pill" id="paneerTargetStatus">Target: 75–100 g</div>
+              </div>
+              <div class="item-sub-input">
+                <label for="paneerInput">Paneer eaten today:</label>
+                <div class="input-with-target">
+                  <div class="input-with-unit">
+                    <input type="number" id="paneerInput" min="0" max="1000" step="5" value="0" placeholder="0">
+                    <span class="unit-tag">grams</span>
+                  </div>
+                  <div class="quick-stepper">
+                    <button type="button" class="btn-quick-target" onclick="setPaneer(75)">75 g</button>
+                    <button type="button" class="btn-quick-target" onclick="setPaneer(80)">80 g</button>
+                    <button type="button" class="btn-quick-target" onclick="setPaneer(100)">100 g</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 4. WATER -->
+            <div class="checklist-item-box water-box">
+              <div class="item-main">
+                <div class="item-title-row">
+                  <span class="item-emoji">💧</span>
+                  <div class="item-info">
+                    <label class="item-title" for="waterInput">Water Intake: Target 2.5 Litres</label>
+                    <span class="item-desc">Crucial for metabolism and hydration (20 pts)</span>
+                  </div>
+                </div>
+                <div class="target-status-pill" id="waterAchievementTag">0 / 2.5 L</div>
+              </div>
+
+              <!-- Visual Water Progress Bar -->
+              <div class="water-progress-section">
+                <div class="water-progress-header">
+                  <span id="waterProgressText">Water: 0.00 L / 2.50 L</span>
+                  <span id="waterPercentageText">0%</span>
+                </div>
+                <div class="water-progress-track">
+                  <div class="water-progress-fill" id="waterProgressBar" style="width: 0%;"></div>
+                </div>
+                <div class="water-success-banner" id="waterSuccessBanner" style="display: none;">
+                  Water target achieved ✓
+                </div>
+              </div>
+
+              <!-- Water Input & Quick Add Buttons -->
+              <div class="water-controls">
+                <div class="water-input-row">
+                  <label for="waterInput">Water consumed:</label>
+                  <div class="input-with-unit">
+                    <input type="number" id="waterInput" min="0" max="10" step="0.05" value="0.00">
+                    <span class="unit-tag">Litres</span>
+                  </div>
+                </div>
+                <div class="quick-water-buttons">
+                  <span class="quick-water-label">Quick Add:</span>
+                  <button type="button" class="btn-water-quick" onclick="addWater(0.25)">+250 ml</button>
+                  <button type="button" class="btn-water-quick" onclick="addWater(0.50)">+500 ml</button>
+                  <button type="button" class="btn-water-quick" onclick="addWater(1.00)">+1 Litre</button>
+                  <button type="button" class="btn-water-reset" onclick="resetWater()" title="Reset water to 0">↺</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- 5. OTHER DIET CHECKS (POSITIVE DISCIPLINE) -->
+            <div class="checklist-item-box">
+              <div class="item-main">
+                <div class="item-title-row">
+                  <span class="item-emoji">🛡️</span>
+                  <div class="item-info">
+                    <span class="item-title">Healthy Food Choices & Habits</span>
+                    <span class="item-desc">Staying mindful with snacks and sugars (35 pts total)</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="habits-checkbox-grid">
+                <div class="habit-option">
+                  <input type="checkbox" id="habitSweets" class="custom-checkbox">
+                  <label for="habitSweets">
+                    <span class="habit-name">🍬 Avoided sweets</span>
+                    <span class="habit-pts">10 pts</span>
+                  </label>
+                </div>
+
+                <div class="habit-option">
+                  <input type="checkbox" id="habitDrinks" class="custom-checkbox">
+                  <label for="habitDrinks">
+                    <span class="habit-name">🥤 Avoided sugary drinks</span>
+                    <span class="habit-pts">10 pts</span>
+                  </label>
+                </div>
+
+                <div class="habit-option">
+                  <input type="checkbox" id="habitFried" class="custom-checkbox">
+                  <label for="habitFried">
+                    <span class="habit-name">🍟 Avoided fried/oily food</span>
+                    <span class="habit-pts">10 pts</span>
+                  </label>
+                </div>
+
+                <div class="habit-option">
+                  <input type="checkbox" id="habitSnacks" class="custom-checkbox">
+                  <label for="habitSnacks">
+                    <span class="habit-name">🍪 Avoided unnecessary snacks</span>
+                    <span class="habit-pts">5 pts</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <!-- SUBMIT BUTTON -->
+            <div class="form-actions">
+              <button type="submit" class="btn-primary-large" id="submitChecklistBtn">
+                SUBMIT TODAY'S REPORT
+              </button>
+              <p class="form-help-text" id="formHelpText">
+                You can update this record at any time today. No duplicates will be created.
+              </p>
+            </div>
+
+          </form>
+        </section>
+
+        <!-- DAILY ACHIEVEMENT REPORT CARD -->
+        <section class="card report-card" id="achievementReportCard">
+          <div class="card-header">
+            <div>
+              <span class="badge-accent">📊 Daily Result</span>
+              <h2>Today's Achievement</h2>
+            </div>
+            <span class="report-date-tag" id="reportDateTag">Today</span>
+          </div>
+
+          <div class="report-content">
+            <!-- Circular / Large Score Badge -->
+            <div class="score-display-container">
+              <div class="score-circle" id="reportScoreCircle">
+                <span class="score-number" id="reportScoreNumber">0%</span>
+                <span class="score-label">Score</span>
+              </div>
+              <div class="motivational-feedback-box">
+                <p class="feedback-title" id="reportFeedbackTitle">Your Daily Summary</p>
+                <p class="feedback-message" id="reportFeedbackMessage">
+                  Submit today's checklist above to generate your score and report!
+                </p>
+              </div>
+            </div>
+
+            <!-- Breakdown List -->
+            <div class="report-breakdown">
+              <h3>Detailed Targets Breakdown</h3>
+              <div class="breakdown-grid" id="reportBreakdownList">
+                <div class="breakdown-item">
+                  <span class="item-text">🥬 Vegetables</span>
+                  <span class="item-status pending">Pending</span>
+                </div>
+                <div class="breakdown-item">
+                  <span class="item-text">🥚 Eggs (Target: 2)</span>
+                  <span class="item-status pending">Pending</span>
+                </div>
+                <div class="breakdown-item">
+                  <span class="item-text">🧀 Paneer (75–100 g)</span>
+                  <span class="item-status pending">Pending</span>
+                </div>
+                <div class="breakdown-item">
+                  <span class="item-text">💧 Water (2.5 L)</span>
+                  <span class="item-status pending">Pending</span>
+                </div>
+                <div class="breakdown-item">
+                  <span class="item-text">🍬 Sweets avoided</span>
+                  <span class="item-status pending">Pending</span>
+                </div>
+                <div class="breakdown-item">
+                  <span class="item-text">🥤 Sugary drinks avoided</span>
+                  <span class="item-status pending">Pending</span>
+                </div>
+                <div class="breakdown-item">
+                  <span class="item-text">🍟 Fried food avoided</span>
+                  <span class="item-status pending">Pending</span>
+                </div>
+                <div class="breakdown-item">
+                  <span class="item-text">🍪 Unnecessary snacks avoided</span>
+                  <span class="item-status pending">Pending</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+
+      <!-- RIGHT COLUMN: WEIGHT ENTRY & GRAPHS -->
+      <div class="layout-column">
+
+        <!-- DAILY WEIGHT ENTRY CARD -->
+        <section class="card weight-card" id="weightEntrySection">
+          <div class="card-header">
+            <div>
+              <span class="badge-accent">⚖️ Morning Measure</span>
+              <h2>Today's Weight</h2>
+            </div>
+            <span class="start-weight-tag">Start: 85.0 kg</span>
+          </div>
+
+          <form id="weightEntryForm" onsubmit="event.preventDefault(); handleWeightSubmit();">
+            <div class="weight-input-container">
+              <label for="weightInput" class="weight-input-label">Enter today's weight:</label>
+              <div class="weight-field-group">
+                <input type="number" id="weightInput" step="0.1" min="40" max="250" placeholder="e.g. 84.5" required>
+                <span class="weight-unit">kg</span>
+                <button type="submit" class="btn-save-weight" id="saveWeightBtn">Save Weight</button>
+              </div>
+            </div>
+          </form>
+
+          <!-- Calculated Weight Stats -->
+          <div class="weight-stats-display" id="weightStatsDisplay">
+            <div class="weight-stat-row">
+              <span class="stat-lbl">Starting Weight:</span>
+              <span class="stat-val">85.0 kg</span>
+            </div>
+            <div class="weight-stat-row">
+              <span class="stat-lbl">Latest Recorded:</span>
+              <span class="stat-val" id="dispCurrentWeight">85.0 kg</span>
+            </div>
+            <div class="weight-stat-row highlight-stat">
+              <span class="stat-lbl">Total Weight Change:</span>
+              <span class="stat-val" id="dispTotalChange">0.0 kg</span>
+            </div>
+            <div class="weight-stat-row">
+              <span class="stat-lbl">Change from Yesterday:</span>
+              <span class="stat-val" id="dispYesterdayChange">--</span>
+            </div>
+            <!-- Neutral and uplifting message -->
+            <div class="weight-message-banner" id="weightMessageBanner">
+              Record your weight consistently in the morning for best tracking.
+            </div>
+          </div>
+        </section>
+
+        <!-- WEIGHT PROGRESS GRAPH -->
+        <section class="card chart-card">
+          <div class="card-header">
+            <div>
+              <span class="badge-accent">📈 Trend</span>
+              <h2>Weight Progress</h2>
+            </div>
+            <span class="chart-subtitle">Target Goal: Continuous Progress</span>
+          </div>
+          <div class="chart-wrapper">
+            <canvas id="weightChart"></canvas>
+          </div>
+        </section>
+
+        <!-- DAILY SUCCESS GRAPH -->
+        <section class="card chart-card">
+          <div class="card-header">
+            <div>
+              <span class="badge-accent">🎯 Consistency</span>
+              <h2>Daily Diet Achievement</h2>
+            </div>
+            <span class="chart-subtitle">Daily Compliance %</span>
+          </div>
+          <div class="chart-wrapper">
+            <canvas id="achievementChart"></canvas>
+          </div>
+        </section>
+
+      </div>
+
+    </div>
+
+    <!-- DAILY HISTORY SECTION -->
+    <section class="card history-card" id="historySection">
+      <div class="card-header">
+        <div>
+          <span class="badge-accent">📜 Archive</span>
+          <h2>Daily History</h2>
+        </div>
+        <div class="history-actions">
+          <span class="history-count" id="historyCount">0 entries recorded</span>
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table class="history-table" id="historyTable">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Weight</th>
+              <th>Achievement</th>
+              <th>Water</th>
+              <th>Eggs</th>
+              <th>Paneer</th>
+              <th>Vegetables</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="historyTableBody">
+            <!-- Rows dynamically rendered by JS -->
+          </tbody>
+        </table>
+      </div>
+
+      <div class="empty-state" id="emptyHistoryState" style="display: none;">
+        <span class="empty-icon">🌱</span>
+        <p>No records saved yet. Fill out today's checklist and save your weight above to get started!</p>
+      </div>
+    </section>
+
+    <!-- SETTINGS & DATA MANAGEMENT MODAL / CARD -->
+    <section class="card settings-card">
+      <div class="card-header">
+        <div>
+          <span class="badge-accent">⚙️ Settings & Privacy</span>
+          <h2>Data Management & Backup</h2>
+        </div>
+      </div>
+      <p class="settings-desc">
+        All your records are stored securely on this computer in your browser's LocalStorage. You can export a backup copy anytime or restore previous data.
+      </p>
+      <div class="settings-actions">
+        <button type="button" class="btn-secondary" onclick="exportDataBackup()">📥 Export Backup (JSON)</button>
+        <label class="btn-secondary file-upload-label">
+          📤 Import Backup
+          <input type="file" id="importFileInput" accept=".json" onchange="importDataBackup(event)" style="display: none;">
+        </label>
+        <button type="button" class="btn-danger-outline" onclick="confirmResetAllData()">⚠️ Reset All Data</button>
+      </div>
+    </section>
+
+    <!-- HEALTH DISCLAIMER FOOTER -->
+    <footer class="app-footer">
+      <p class="disclaimer">
+        ℹ️ <strong>Important Note:</strong> UDYAMAM is a friendly personal diet and weight tracking tool designed for self-monitoring. It is not a medical device or diagnostic application and does not prescribe medical treatments. Always consult your personal physician or certified nutritionist for tailored health guidance.
+      </p>
+      <p class="copyright">UDYAMAM &bull; Built with care for Amma's Health &bull; 2026</p>
+    </footer>
+
+  </div>
+
+  <!-- POPUP MODAL FOR VIEWING A SPECIFIC DAY'S DETAIL -->
+  <div class="modal-backdrop" id="detailModalBackdrop" onclick="closeDetailModal(event)">
+    <div class="modal-dialog" role="dialog" aria-modal="true" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <h3 id="modalDateTitle">Record Details</h3>
+        <button type="button" class="btn-close-modal" onclick="closeDetailModal()">&times;</button>
+      </div>
+      <div class="modal-body" id="modalBodyContent">
+        <!-- Rendered dynamically -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary" onclick="closeDetailModal()">Close</button>
+        <button type="button" class="btn-primary" id="modalEditBtn">Edit This Day</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Application Logic -->
+  <script src="script.js"></script>
+</body>
+</html>
